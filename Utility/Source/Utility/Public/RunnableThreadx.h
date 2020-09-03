@@ -2,8 +2,8 @@
 
 #pragma once
 #include "Runtime/Core/Public/HAL/Runnable.h"
-#include "RunnableThread.h"
-#include "Runtime/Core/Public/HAL/ThreadSafeBool.h "
+#include "HAL/RunnableThread.h"
+#include "Runtime/Core/Public/HAL/ThreadSafeBool.h"
 #include "CoreMinimal.h"
 
 /**

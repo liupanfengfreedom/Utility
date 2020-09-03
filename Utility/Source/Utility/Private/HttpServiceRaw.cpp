@@ -46,7 +46,7 @@ void HttpServiceRaw::SetRequestHeaders(TSharedRef<IHttpRequest>& Request) {
 	//Request->SetHeader(TEXT("Accept-Language"), TEXT("zh-CN,zh;q=0.9"));
 	//Request->SetHeader(TEXT("Connection"), TEXT("keep-alive"));
 	//Request->SetHeader(TEXT("Sec-Fetch-Mode"), TEXT("navigate"));
-	//Request->SetHeader(TEXT("Sec-Fetch-Site"), TEXT("none"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("multipart/form-data"));
 	//Request->SetHeader(TEXT("Upgrade-Insecure-Requests"), TEXT("1"));
 	//Request->SetHeader(TEXT("User-Agent"), TEXT("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"));
 

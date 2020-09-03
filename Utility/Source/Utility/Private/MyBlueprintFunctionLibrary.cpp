@@ -14,6 +14,10 @@
 #include "Runtime/Core/Public/Misc/CoreDelegates.h"
 #include "Runtime/Core/Public/Misc/SecureHash.h"
 #include "Runtime/Core/Public/HAL/UnrealMemory.h"
+#include "Media/Public/IMediaCaptureSupport.h"
+#include "MediaUtils/Public/MediaCaptureSupport.h"
+#include "Slate/Public/Framework/Application/SlateApplication.h"
+#include "ApplicationCore/Public/Windows/WindowsPlatformApplicationMisc.h"
 #include "MobileUtilsBlueprintLibrary.h"
 
 TArray<FString> UMyBlueprintFunctionLibrary::MountedPakList;
@@ -47,7 +51,7 @@ void UMyBlueprintFunctionLibrary::readstringfromfile(FString filepath, FString &
 }
 void UMyBlueprintFunctionLibrary::readdatafromfile(FString filepath, TArray<uint8> & content)
 {
-		FFileHelper::LoadFileToArray(content, *filepath);
+	FFileHelper::LoadFileToArray(content,*filepath);
 }
 bool UMyBlueprintFunctionLibrary::FileMd5isequalSpecificMd5(FString filepath, FString SpecificMd5)
 {
@@ -110,12 +114,12 @@ bool UMyBlueprintFunctionLibrary::Mount(FString PakFileName)
 	bool fb = FPaths::FileExists(Contentdir);
 	if (fb)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("PakFileName exist"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("PakFileName exist"));
 
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("PakFileName not exist"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("PakFileName not exist"));
 
 		return false;
 	}
@@ -134,12 +138,12 @@ bool UMyBlueprintFunctionLibrary::Mount(FString PakFileName)
 		}
 		if (bSuccess)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("mount ok"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("mount ok"));
 
 		}
 		else
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("mount fail"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("mount fail"));
 			return false;
 
 		}
@@ -204,25 +208,17 @@ bool UMyBlueprintFunctionLibrary::UnMount(FString PakFileName)
 void UMyBlueprintFunctionLibrary::RawImageToTexture2D(const TArray<uint8> &RawFileData, class UTexture2D *& out_texture)
 {
 	IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-	TSharedPtr<IImageWrapper> ImageWrappers[3] =
+	TSharedPtr<IImageWrapper> ImageWrappr = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);//mind the postfix of the source file
+	if (ImageWrappr.IsValid()&& ImageWrappr->SetCompressed(RawFileData.GetData(), RawFileData.Num()))
 	{
-		ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG),
-		ImageWrapperModule.CreateImageWrapper(EImageFormat::JPEG),
-		ImageWrapperModule.CreateImageWrapper(EImageFormat::BMP),
-	};
-	for (auto ImageWrapper : ImageWrappers)
-	{
-		if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(RawFileData.GetData(), RawFileData.Num()))
+		const TArray<uint8>*UncompressedBGRA = NULL;
+		if (ImageWrappr->GetRaw(ERGBFormat::BGRA, 8, UncompressedBGRA))
 		{
-			const TArray<uint8>* UncompressedBGRA = NULL;
-			if (ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, UncompressedBGRA))
-			{
-				out_texture = UTexture2D::CreateTransient(ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), PF_B8G8R8A8);
-				void* TextureData = (uint8*)out_texture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
-				FMemory::Memcpy(TextureData, UncompressedBGRA->GetData(), UncompressedBGRA->Num());
-				out_texture->PlatformData->Mips[0].BulkData.Unlock();
-				out_texture->UpdateResource();
-			}
+			out_texture = UTexture2D::CreateTransient(ImageWrappr->GetWidth(),ImageWrappr->GetHeight(), PF_B8G8R8A8);
+			void* TextureData = (uint8*)out_texture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+			FMemory::Memcpy(TextureData, UncompressedBGRA->GetData(),UncompressedBGRA->Num());
+			out_texture->PlatformData->Mips[0].BulkData.Unlock();
+			out_texture->UpdateResource();
 		}
 	}
 }
@@ -251,6 +247,29 @@ const FString UMyBlueprintFunctionLibrary::Screenshoot(FString  infilename, bool
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, *fullpath);
 		return fullpath;
 	}
+}
+TArray<FString> UMyBlueprintFunctionLibrary::getcamerainfor()
+{
+	TArray<FString> urls;
+	TArray<FMediaCaptureDeviceInfo> DeviceInfos;
+	MediaCaptureSupport::EnumerateVideoCaptureDevices(DeviceInfos);
+	for (auto var : DeviceInfos)
+	{
+		urls.Add(var.DisplayName.ToString() + "?" + var.Url);
+	}
+	return urls;
+}
+FLinearColor UMyBlueprintFunctionLibrary::getcolorinforundercursor()
+{
+	FVector2D CurrentCursorPosition = FSlateApplication::Get().GetCursorPos();
+	return FPlatformApplicationMisc::GetScreenPixelColor(CurrentCursorPosition, 1.0f/*Gamma*/);
+}
+TArray<FString> UMyBlueprintFunctionLibrary::findallfileunderpath(FString path, FString FileExtension)
+{
+	TArray<FString> files;
+	//FPlatformFileManager::Get().GetPlatformFile().FindFilesRecursively(files, L"D:\\ueprojects\\MyProject", L".h");
+	FPlatformFileManager::Get().GetPlatformFile().FindFilesRecursively(files, *path, *FileExtension);
+	return files;
 }
 void UMyBlueprintFunctionLibrary::Ongameinitfunc()
 {

@@ -45,6 +45,12 @@ public:
 	static UObject* Loadobject(FString path);
 	UFUNCTION(BlueprintCallable, Category = "Mybp")
 	static const FString Screenshoot(FString infilename,bool bInShowUI,bool bAddFilenameSuffix, bool brelativepath = true);
+	UFUNCTION(BlueprintCallable, Category = "Mybp")
+	static TArray<FString> getcamerainfor();
+	UFUNCTION(BlueprintCallable, Category = "Mybp")
+	static FLinearColor getcolorinforundercursor();
+	UFUNCTION(BlueprintCallable, Category = "Mybp")
+	static TArray<FString> findallfileunderpath(FString path,FString FileExtension);
 public:
 	UFUNCTION(BlueprintCallable, Category = "Mybp")
 	static void Ongameinitfunc();
