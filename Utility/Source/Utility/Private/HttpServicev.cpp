@@ -65,7 +65,7 @@ void UHttpServicev::HttpPost(FString uri, FString username, FString password, FS
 }
 void UHttpServicev::HttpResponseComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,TEXT("HttpResponseComplete"));
+	////GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,TEXT("HttpResponseComplete"));
 	if (!ResponseIsValid(Response, bWasSuccessful))
 	{
 		OnHtpResponseFailed.Broadcast();
@@ -75,11 +75,11 @@ void UHttpServicev::HttpResponseComplete(FHttpRequestPtr Request, FHttpResponseP
 }
 void UHttpServicev::HttpResponseProgress(FHttpRequestPtr Resquest, int32 a, int32 b)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::FromInt(b).Append(FString(": b")));
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::FromInt(a).Append(FString(": a")));
+	////GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::FromInt(b).Append(FString(": b")));
+	////GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::FromInt(a).Append(FString(": a")));
 	float percent = (1000.0 * b) / 730130476;
 
-//	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::FromInt(percent).Append(FString(": percent")));
+//	////GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::FromInt(percent).Append(FString(": percent")));
 	if (OnHttpResponseProgress.IsBound())
 	{
 		OnHttpResponseProgress.Broadcast(a, b, extra);

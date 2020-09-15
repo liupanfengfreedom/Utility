@@ -35,6 +35,7 @@ public:
 	UObject* extra;
 public:
 	void HttpGet(FString uri);
+	void HttpGet(FString uri, FString username, FString password);
 	void HttpPost(FString uri, FString username, FString password, FString payload, FString content);
 	void HttpPost(FString uri, FString username, FString password, FString payload, TArray<uint8> & content);
 	void HttpResponseHeaderReceived(FHttpRequestPtr Request, const FString& headername, const FString& headervalue);

@@ -56,7 +56,7 @@ void UTcpClient::ReceiveWork()
 
 	while (true)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("UTcpClient threadworker"));
+		////GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("UTcpClient threadworker"));
 		FPlatformProcess::Sleep(period);
 		if (Socket == nullptr)break;
 		bool b = Socket->HasPendingData(datasize);

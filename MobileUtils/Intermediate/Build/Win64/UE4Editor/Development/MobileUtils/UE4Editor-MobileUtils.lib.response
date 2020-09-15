@@ -1,0 +1,14 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UE4Editor-MobileUtils.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"D:\66iphone\FaceARSample\Intermediate\Build\Win64\FaceARSampleEditor\Development\Engine\SharedPCH.Engine.h.obj"
+"D:\66iphone\FaceARSample\Plugins\MobileUtils\Intermediate\Build\Win64\UE4Editor\Development\MobileUtils\Module.MobileUtils.cpp.obj"
+"D:\66iphone\FaceARSample\Plugins\MobileUtils\Intermediate\Build\Win64\UE4Editor\Development\MobileUtils\Module.MobileUtils.gen.cpp.obj"
+"D:\66iphone\FaceARSample\Plugins\MobileUtils\Intermediate\Build\Win64\UE4Editor\Development\MobileUtils\Default.rc2.res"
+/OUT:"D:\66iphone\FaceARSample\Plugins\MobileUtils\Intermediate\Build\Win64\UE4Editor\Development\MobileUtils\UE4Editor-MobileUtils.lib"
+/INCLUDE:IMPLEMENT_MODULE_MobileUtils

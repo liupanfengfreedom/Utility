@@ -53,7 +53,7 @@ bool  RunnableThreadx::IsThreadKilled()
 
 bool  RunnableThreadx::Init()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("RunnableThreadxInit"));
+	////GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("RunnableThreadxInit"));
 	return true;
 }
 uint32  RunnableThreadx::Run()
@@ -65,7 +65,7 @@ uint32  RunnableThreadx::Run()
 		if (m_Pause)
 		{
 			FPlatformProcess::Sleep(0.1);
-			//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("AudioRecordThreadPause"));
+			////GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("AudioRecordThreadPause"));
 			if (m_Kill)
 			{
 				return 0;
@@ -73,7 +73,7 @@ uint32  RunnableThreadx::Run()
 		}
 		else
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("AudioRecordThreadLoop"));
+			////GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("AudioRecordThreadLoop"));
 
 			//m_mutex.Lock();
 			////需要同步处理的内容
@@ -92,11 +92,11 @@ void RunnableThreadx::Stop()
 	StopTaskCounter.Increment();
 	m_Kill = true;
 	m_Pause = false;
-	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("AudioRecordThreadStop"));
+	////GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("AudioRecordThreadStop"));
 
 }
 
 void RunnableThreadx::Exit()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("AudioRecordThreadExit"));
+	////GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("AudioRecordThreadExit"));
 }

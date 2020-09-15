@@ -15,20 +15,20 @@ TcpClientv::TcpClientv()
 	bool b = Socket->SetSendBufferSize(TCPSENDBUFFERSIZE, newsize);
 	if (b)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("sendbuffersize  for this os ok "));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("sendbuffersize  for this os ok "));
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("sendbuffersize  for this os failed "));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("sendbuffersize  for this os failed "));
 	}
 	b = Socket->SetReceiveBufferSize(65536,newsize);
 	if (b)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Receivebuffersize  for this os ok "));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Receivebuffersize  for this os ok "));
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Receivebuffersize  for this os failed "));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Receivebuffersize  for this os failed "));
 	}
 }
 
@@ -96,7 +96,7 @@ void TcpClientv::ReceiveWork()
 			delete this;
 			break;
 		}
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("UTcpClient threadworker"));
+		////GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("UTcpClient threadworker"));
 		FPlatformProcess::Sleep(0.03);
 		ESocketConnectionState state = Socket->GetConnectionState();
 		if (state != ESocketConnectionState::SCS_Connected)

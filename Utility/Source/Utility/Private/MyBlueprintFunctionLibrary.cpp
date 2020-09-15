@@ -14,12 +14,13 @@
 #include "Runtime/Core/Public/Misc/CoreDelegates.h"
 #include "Runtime/Core/Public/Misc/SecureHash.h"
 #include "Runtime/Core/Public/HAL/UnrealMemory.h"
+#include "MobileUtilsBlueprintLibrary.h"
 #include "Media/Public/IMediaCaptureSupport.h"
 #include "MediaUtils/Public/MediaCaptureSupport.h"
 #include "Slate/Public/Framework/Application/SlateApplication.h"
+#if PLATFORM_WINDOWS
 #include "ApplicationCore/Public/Windows/WindowsPlatformApplicationMisc.h"
-#include "MobileUtilsBlueprintLibrary.h"
-
+#endif
 TArray<FString> UMyBlueprintFunctionLibrary::MountedPakList;
 TArray<Fonge> UMyBlueprintFunctionLibrary::OnGameInitevent;
 TArray<Fonge> UMyBlueprintFunctionLibrary::OnGameexit;
@@ -51,7 +52,7 @@ void UMyBlueprintFunctionLibrary::readstringfromfile(FString filepath, FString &
 }
 void UMyBlueprintFunctionLibrary::readdatafromfile(FString filepath, TArray<uint8> & content)
 {
-	FFileHelper::LoadFileToArray(content,*filepath);
+		FFileHelper::LoadFileToArray(content, *filepath);
 }
 bool UMyBlueprintFunctionLibrary::FileMd5isequalSpecificMd5(FString filepath, FString SpecificMd5)
 {
@@ -130,7 +131,7 @@ bool UMyBlueprintFunctionLibrary::Mount(FString PakFileName)
 		auto bSuccess = FCoreDelegates::OnMountPak.Execute(AbsPakPath, PakReadOrder, nullptr);
 		if (!bSuccess)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("sandbox"));
+			////GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("sandbox"));
 
 			// This can fail because of the sandbox system - which the pak system doesn't understand.
 			auto SandboxedPath = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*AbsPakPath);
@@ -167,12 +168,12 @@ bool UMyBlueprintFunctionLibrary::UnMount(FString PakFileName)
 	bool fb = FPaths::FileExists(Contentdir);
 	if (fb)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("PakFileName exist"));
+		////GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("PakFileName exist"));
 
 	}
 	else
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("PakFileName not exist"));
+		////GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("PakFileName not exist"));
 
 		return false;
 	}
@@ -183,7 +184,7 @@ bool UMyBlueprintFunctionLibrary::UnMount(FString PakFileName)
 		auto bSuccess = FCoreDelegates::OnUnmountPak.Execute(AbsPakPath);
 		if (!bSuccess)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("unmount sandbox"));
+			////GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("unmount sandbox"));
 
 			// This can fail because of the sandbox system - which the pak system doesn't understand.
 			auto SandboxedPath = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*AbsPakPath);
@@ -191,12 +192,12 @@ bool UMyBlueprintFunctionLibrary::UnMount(FString PakFileName)
 		}
 		if (bSuccess)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("unmount ok"));
+			////GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("unmount ok"));
 
 		}
 		else
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("unmount fail"));
+			////GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("unmount fail"));
 			return false;
 
 		}
@@ -208,23 +209,31 @@ bool UMyBlueprintFunctionLibrary::UnMount(FString PakFileName)
 void UMyBlueprintFunctionLibrary::RawImageToTexture2D(const TArray<uint8> &RawFileData, class UTexture2D *& out_texture)
 {
 	IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-	TSharedPtr<IImageWrapper> ImageWrappr = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);//mind the postfix of the source file
-	if (ImageWrappr.IsValid()&& ImageWrappr->SetCompressed(RawFileData.GetData(), RawFileData.Num()))
+	TSharedPtr<IImageWrapper> ImageWrappers[3] =
 	{
-		const TArray<uint8>*UncompressedBGRA = NULL;
-		if (ImageWrappr->GetRaw(ERGBFormat::BGRA, 8, UncompressedBGRA))
+		ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG),
+		ImageWrapperModule.CreateImageWrapper(EImageFormat::JPEG),
+		ImageWrapperModule.CreateImageWrapper(EImageFormat::BMP),
+	};
+	for (auto ImageWrapper : ImageWrappers)
+	{
+		if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(RawFileData.GetData(), RawFileData.Num()))
 		{
-			out_texture = UTexture2D::CreateTransient(ImageWrappr->GetWidth(),ImageWrappr->GetHeight(), PF_B8G8R8A8);
-			void* TextureData = (uint8*)out_texture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
-			FMemory::Memcpy(TextureData, UncompressedBGRA->GetData(),UncompressedBGRA->Num());
-			out_texture->PlatformData->Mips[0].BulkData.Unlock();
-			out_texture->UpdateResource();
+			TArray<uint8> UncompressedBGRA;
+			if (ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, UncompressedBGRA))
+			{
+				out_texture = UTexture2D::CreateTransient(ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), PF_B8G8R8A8);
+				void* TextureData = (uint8*)out_texture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+				FMemory::Memcpy(TextureData, UncompressedBGRA.GetData(), UncompressedBGRA.Num());
+				out_texture->PlatformData->Mips[0].BulkData.Unlock();
+				out_texture->UpdateResource();
+			}
 		}
 	}
 }
 void UMyBlueprintFunctionLibrary::CLogtofile(FString msg)
 {
-	FFileHelper::SaveStringToFile(msg+"  :"+FDateTime::UtcNow().ToString()+"\n", *FPaths::ProjectSavedDir().Append("Log.log"), FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_Append);
+	FFileHelper::SaveStringToFile(msg+"  :"+FDateTime::UtcNow().ToString()+"\n", *(FPaths::ProjectSavedDir()+"Log.log"), FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_Append);
 }
 UObject* UMyBlueprintFunctionLibrary::Loadobject(FString path)
 {
@@ -237,14 +246,14 @@ const FString UMyBlueprintFunctionLibrary::Screenshoot(FString  infilename, bool
 	FString path = FScreenshotRequest::GetFilename(); 
 	if (brelativepath)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, *path);
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, *path);
 		return path;
 	}
 	else
 	{
 //		FString fullpath = FPaths::ConvertRelativePathToFull(path);
         FString fullpath = UMobileUtilsBlueprintLibrary::ConvertToAbsolutePath(path);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, *fullpath);
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, *fullpath);
 		return fullpath;
 	}
 }
@@ -261,8 +270,11 @@ TArray<FString> UMyBlueprintFunctionLibrary::getcamerainfor()
 }
 FLinearColor UMyBlueprintFunctionLibrary::getcolorinforundercursor()
 {
+#if PLATFORM_WINDOWS
 	FVector2D CurrentCursorPosition = FSlateApplication::Get().GetCursorPos();
 	return FPlatformApplicationMisc::GetScreenPixelColor(CurrentCursorPosition, 1.0f/*Gamma*/);
+#endif // PLATFORM_WINDOWS
+	return FLinearColor();
 }
 TArray<FString> UMyBlueprintFunctionLibrary::findallfileunderpath(FString path, FString FileExtension)
 {
@@ -274,7 +286,7 @@ TArray<FString> UMyBlueprintFunctionLibrary::findallfileunderpath(FString path, 
 void UMyBlueprintFunctionLibrary::Ongameinitfunc()
 {
 	//clear log file content
-	FFileHelper::SaveStringToFile(FString("log file") + "  :" + FDateTime::UtcNow().ToString() + "\n", *FPaths::ProjectSavedDir().Append("Log.log"), FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_None);
+	FFileHelper::SaveStringToFile(FString("log file") + "  :" + FDateTime::UtcNow().ToString() + "\n", *(FPaths::ProjectSavedDir()+"Log.log"), FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_None);
 	for (auto var : OnGameInitevent)//
 	{
 		var.ExecuteIfBound();

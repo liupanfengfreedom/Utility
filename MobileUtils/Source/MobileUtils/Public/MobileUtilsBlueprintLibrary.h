@@ -11,7 +11,7 @@ UCLASS()
 class MOBILEUTILS_API UMobileUtilsBlueprintLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
-
+public:
 	UFUNCTION(BlueprintCallable, Category = MobileUtils)
 	static void SetOrientation(int orientation);
 	

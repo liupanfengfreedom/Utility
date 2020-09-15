@@ -19,13 +19,13 @@ TSharedPtr<HttpServiceRaw, ESPMode::ThreadSafe> HttpServiceRaw::GetANewInstance(
 			var->OnHtpResponseFailed.Unbind();
 			var->OnHttpResponseProgress.Unbind();
 			var->OnHttpResponseComplete.Unbind();
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("recycle HttpServiceRaw"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("recycle HttpServiceRaw"));
 			return var;
 		}
 	}
 	TSharedPtr<HttpServiceRaw, ESPMode::ThreadSafe> temp = MakeShareable(new HttpServiceRaw());
 	httppool.Add(temp);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("create a new one HttpServiceRaw"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("create a new one HttpServiceRaw"));
 	return temp;
 }
 HttpServiceRaw::~HttpServiceRaw()
@@ -46,7 +46,7 @@ void HttpServiceRaw::SetRequestHeaders(TSharedRef<IHttpRequest>& Request) {
 	//Request->SetHeader(TEXT("Accept-Language"), TEXT("zh-CN,zh;q=0.9"));
 	//Request->SetHeader(TEXT("Connection"), TEXT("keep-alive"));
 	//Request->SetHeader(TEXT("Sec-Fetch-Mode"), TEXT("navigate"));
-	Request->SetHeader(TEXT("Content-Type"), TEXT("multipart/form-data"));
+	//Request->SetHeader(TEXT("Sec-Fetch-Site"), TEXT("none"));
 	//Request->SetHeader(TEXT("Upgrade-Insecure-Requests"), TEXT("1"));
 	//Request->SetHeader(TEXT("User-Agent"), TEXT("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"));
 
@@ -57,6 +57,20 @@ void HttpServiceRaw::HttpGet(FString uri)
 	TSharedRef<IHttpRequest> Request = Http->CreateRequest();
 	Request->SetURL(uri);
 	SetRequestHeaders(Request);
+	Request->SetVerb("GET");
+	Request->OnHeaderReceived().BindRaw(this, &HttpServiceRaw::HttpResponseHeaderReceived);
+	Request->OnProcessRequestComplete().BindRaw(this, &HttpServiceRaw::HttpResponseComplete);
+	Request->OnRequestProgress().BindRaw(this, &HttpServiceRaw::HttpResponseProgress);
+	Request->ProcessRequest();
+}
+void HttpServiceRaw::HttpGet(FString uri, FString username, FString password)
+{
+	busy = true;
+	TSharedRef<IHttpRequest> Request = Http->CreateRequest();
+	Request->SetURL(uri);
+	SetRequestHeaders(Request);
+	Request->SetHeader(TEXT("UserName"), username);
+	Request->SetHeader(TEXT("Password"), password);
 	Request->SetVerb("GET");
 	Request->OnHeaderReceived().BindRaw(this, &HttpServiceRaw::HttpResponseHeaderReceived);
 	Request->OnProcessRequestComplete().BindRaw(this, &HttpServiceRaw::HttpResponseComplete);
@@ -102,11 +116,11 @@ void HttpServiceRaw::HttpResponseHeaderReceived(FHttpRequestPtr Request, const F
 }
 void HttpServiceRaw::HttpResponseComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,TEXT("HttpResponseComplete"));
+	////GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,TEXT("HttpResponseComplete"));
 	if (!ResponseIsValid(Response, bWasSuccessful))
 	{
 		OnHtpResponseFailed.ExecuteIfBound();
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("DOWNLOAD FAILED"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("DOWNLOAD FAILED"));
 		return;
 	}
 	OnHttpResponseComplete.ExecuteIfBound(Response->GetContentAsString(), Response->GetContent(), extra);
@@ -114,15 +128,15 @@ void HttpServiceRaw::HttpResponseComplete(FHttpRequestPtr Request, FHttpResponse
 }
 void HttpServiceRaw::HttpResponseProgress(FHttpRequestPtr Resquest, int32 a, int32 b)
 {
-//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::FromInt(b).Append(FString(": b")));
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Resquest->GetAllHeaders());
+//	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::FromInt(b).Append(FString(": b")));
+	////GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Resquest->GetAllHeaders());
 	if (filesizeinserver <= 0)return;
 	float percent_f = ((float)b*1000) / filesizeinserver;
 	UMyBlueprintFunctionLibrary::CLogtofile(FString::FromInt(b).Append("b  ").Append(FString::FromInt(filesizeinserver).Append("filesizeinserver")));
 	percent_f /= 10;
 	FString thefloat = FString::SanitizeFloat(percent_f);
 	UMyBlueprintFunctionLibrary::CLogtofile(thefloat.Append("thefloat"));
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, thefloat);
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, thefloat);
 	if (OnHttpResponseProgress.IsBound())
 	{
 
