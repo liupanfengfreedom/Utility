@@ -17,6 +17,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = MobileUtils)
 	static void StartActivity(const FString& activity);
+	UFUNCTION(BlueprintPure, Category = MobileUtils)
+		static FString Getlocalipaddress();
 	UFUNCTION(BlueprintCallable, Category = MobileUtils)
 	static FString ConvertToAbsolutePath(const FString& path);
 };

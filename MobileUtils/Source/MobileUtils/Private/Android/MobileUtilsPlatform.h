@@ -21,9 +21,10 @@ public:
 	virtual void StartActivity(const FString& activity) override;
 	virtual void DispatchMessage(int message, const JsonSharedPtr jsonObject) override;
 	virtual FString ConvertToAbsolutePath(const FString& path) override;
-
+	virtual FString getlocalipaddress() override;
 	// JNI Methods
 	static jmethodID SetOrientationMethod;
 	static jmethodID StartActivityMethod;
+	static jmethodID GetlocalipaddressMethod;
 	static jmethodID DispatchMessageMethod;
 };

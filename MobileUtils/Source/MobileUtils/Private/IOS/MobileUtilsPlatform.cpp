@@ -4,6 +4,7 @@
 
 #include "MobileUtilsPlatform.h"
 #include "UE4Utils.h"
+#include"slv.h"
 
 FMobileUtilsPlatform::FMobileUtilsPlatform()
 {
@@ -20,7 +21,13 @@ void FMobileUtilsPlatform::SetOrientation(int orientation)
 void FMobileUtilsPlatform::StartActivity(const FString& activity)
 {
 }
-
+FString FMobileUtilsPlatform::getlocalipaddress()
+{
+    char* cp = nullptr;
+    NSString* ts = [slv getIPAddress : true];
+    cp = (char*)[ts UTF8String];
+    return FString(cp);
+}
 void FMobileUtilsPlatform::DispatchMessage(int message, const JsonSharedPtr jsonObject)
 {
     if (jsonObject.IsValid())

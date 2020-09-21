@@ -19,7 +19,7 @@ public:
 	virtual void StartActivity(const FString& activity) = 0;
 	virtual void DispatchMessage(int message, const JsonSharedPtr jsonObject) = 0;
 	virtual FString ConvertToAbsolutePath(const FString& path) = 0;
-
+	virtual FString getlocalipaddress() { return ""; };
 	void SetMessageCallback(MessageCallback callback)
 	{
 		messageCallback = callback;

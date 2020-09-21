@@ -21,7 +21,9 @@ namespace UnrealBuildTool.Rules
 			if (Target.Platform == UnrealTargetPlatform.IOS)
 			{
 				PrivateIncludePaths.Add("MobileUtils/Private/IOS");
-            }
+				var externalLib = Path.Combine(ModuleDirectory, "../ThirdParty");
+				PublicAdditionalLibraries.Add(Path.Combine(externalLib, "iOS/liblocalipaddress.a"));
+			}
 			else if (Target.Platform == UnrealTargetPlatform.Android)
 			{
 				PrivateIncludePaths.Add("MobileUtils/Private/Android");

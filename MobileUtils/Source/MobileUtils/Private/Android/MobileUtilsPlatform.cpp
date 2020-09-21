@@ -8,6 +8,7 @@
 jmethodID FMobileUtilsPlatform::SetOrientationMethod;
 jmethodID FMobileUtilsPlatform::StartActivityMethod;
 jmethodID FMobileUtilsPlatform::DispatchMessageMethod;
+jmethodID FMobileUtilsPlatform::GetlocalipaddressMethod;
 
 FMobileUtilsPlatform::FMobileUtilsPlatform()
 {
@@ -16,6 +17,7 @@ FMobileUtilsPlatform::FMobileUtilsPlatform()
 		SetOrientationMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_SetOrientation", "(I)V", false);
 		StartActivityMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_StartActivity", "(Ljava/lang/String;)V", false);
 		DispatchMessageMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_DispatchMessage", "(ILjava/lang/String;)V", false);
+		GetlocalipaddressMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Getlocalipaddress", "()Ljava/lang/String;", false);
 	}
 }
 
@@ -40,7 +42,19 @@ void FMobileUtilsPlatform::StartActivity(const FString& activity)
 		Env->DeleteLocalRef(JStr);
 	}
 }
-
+FString FMobileUtilsPlatform::getlocalipaddress()
+{
+	FString ResultDeviceId = FString("");
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		jstring ResultDeviceIdString = (jstring)FJavaWrapper::CallObjectMethod(Env, FJavaWrapper::GameActivityThis, FMobileUtilsPlatform::GetlocalipaddressMethod);
+		const char* nativeDeviceIdString = Env->GetStringUTFChars(ResultDeviceIdString, 0);
+		ResultDeviceId = FString(nativeDeviceIdString);
+		Env->ReleaseStringUTFChars(ResultDeviceIdString, nativeDeviceIdString);
+		Env->DeleteLocalRef(ResultDeviceIdString);
+	}
+	return ResultDeviceId;
+}
 void FMobileUtilsPlatform::DispatchMessage(int message, const JsonSharedPtr jsonObject)
 {
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
