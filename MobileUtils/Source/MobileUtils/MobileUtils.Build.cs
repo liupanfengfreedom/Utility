@@ -15,7 +15,14 @@ namespace UnrealBuildTool.Rules
 			PrivateIncludePaths.Add("MobileUtils/Private");
 
             PublicDependencyModuleNames.AddRange(new string[] { "Engine", "Core", "CoreUObject" });
-
+			PrivateDependencyModuleNames.AddRange(
+			new string[]
+			{
+				"Sockets",
+				"Networking",
+				// ... add private dependencies that you statically link with here ...	
+			}
+			);
 			PrivateIncludePathModuleNames.AddRange(new string[] { "Settings" });
 
 			if (Target.Platform == UnrealTargetPlatform.IOS)

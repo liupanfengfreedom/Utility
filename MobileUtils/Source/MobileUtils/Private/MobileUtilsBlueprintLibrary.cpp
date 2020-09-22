@@ -26,10 +26,8 @@ void UMobileUtilsBlueprintLibrary::StartActivity(const FString& activity)
 FString UMobileUtilsBlueprintLibrary::Getlocalipaddress()
 {
 	
-#if PLATFORM_ANDROID || PLATFORM_IOS
 	return IMobileUtils::Get().GetPlatformInterface()->getlocalipaddress();
-#endif
-	return "";
+
 }
 FString UMobileUtilsBlueprintLibrary::ConvertToAbsolutePath(const FString& path)
 {

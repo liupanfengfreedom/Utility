@@ -18,6 +18,7 @@ public:
 	virtual void SetOrientation(int orientation) override;
 	virtual void StartActivity(const FString& activity) override;
 	virtual void DispatchMessage(int message, const JsonSharedPtr jsonObject) override;
+	virtual FString getlocalipaddress() override;
 	virtual FString ConvertToAbsolutePath(const FString& path) override;
 };
 #endif
