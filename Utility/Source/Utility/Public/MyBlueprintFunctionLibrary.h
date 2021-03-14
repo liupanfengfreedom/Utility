@@ -51,6 +51,46 @@ public:
 		static FLinearColor getcolorinforundercursor();
 	UFUNCTION(BlueprintCallable, Category = "Mybp")
 		static TArray<FString> findallfileunderpath(FString path, FString FileExtension);
+	static void* CallBlueprintProperty(const UObject* otherobj, const FName propertyName);
+	static void CallBlueprintfunction(const UObject* otherobj, const FName functionName, void* para);
+	template <class T>
+	static void sortarrray(TArray<T*>& arr, TFunction<bool(T* A, T* B)> compare)
+	{
+		for (int i = 0; i < arr.Num() - 1; i++)
+		{
+			T* flag = (T*)arr[i];
+			int ti = i;
+			for (int j = i + 1; j < arr.Num(); j++)
+			{
+				if (compare(arr[j], flag))
+				{
+					flag = (T*)arr[j];
+					ti = j;
+				}
+			}
+			arr[ti] = arr[i];
+			arr[i] = flag;
+		}
+	}
+	template <class T>
+	static void sortarrray(TArray<T>& arr, TFunction<bool(const T &A, const T& B)> compare)
+	{
+		for (int i = 0; i < arr.Num() - 1; i++)
+		{
+			T flag = (T)arr[i];
+			int ti = i;
+			for (int j = i + 1; j < arr.Num(); j++)
+			{
+				if (compare(arr[j], flag))
+				{
+					flag = (T)arr[j];
+					ti = j;
+				}
+			}
+			arr[ti] = arr[i];
+			arr[i] = flag;
+		}
+	}
 public:
 	UFUNCTION(BlueprintCallable, Category = "Mybp")
 	static void Ongameinitfunc();

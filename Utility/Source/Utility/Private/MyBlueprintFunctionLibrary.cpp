@@ -264,7 +264,7 @@ TArray<FString> UMyBlueprintFunctionLibrary::getcamerainfor()
 	MediaCaptureSupport::EnumerateVideoCaptureDevices(DeviceInfos);
 	for (auto var : DeviceInfos)
 	{
-		urls.Add(var.DisplayName.ToString() + "?" + var.Url);
+		urls.Add(var.DisplayName.ToString() + "???" + var.Url);
 	}
 	return urls;
 }
@@ -282,6 +282,29 @@ TArray<FString> UMyBlueprintFunctionLibrary::findallfileunderpath(FString path, 
 	//FPlatformFileManager::Get().GetPlatformFile().FindFilesRecursively(files, L"D:\\ueprojects\\MyProject", L".h");
 	FPlatformFileManager::Get().GetPlatformFile().FindFilesRecursively(files, *path, *FileExtension);
 	return files;
+}
+void* UMyBlueprintFunctionLibrary::CallBlueprintProperty(const UObject* otherobj, const FName propertyName) {
+	void* outValue = nullptr;
+	FProperty* inProperty = otherobj->GetClass()->FindPropertyByName(propertyName);
+	if (inProperty)
+	{
+		outValue = (void*)inProperty->ContainerPtrToValuePtr<void>(otherobj);
+	}
+	return outValue;
+}
+/// <summary>
+/*
+ struct par{
+  FString p1;
+  int p2;
+  bool p3;
+  float p4;
+ }
+
+*/
+/// <param name="para"></param>
+void UMyBlueprintFunctionLibrary::CallBlueprintfunction(const UObject* otherobj, const FName functionName, void* para) {
+	((UObject*)otherobj)->ProcessEvent(otherobj->FindFunctionChecked(functionName), para);
 }
 void UMyBlueprintFunctionLibrary::Ongameinitfunc()
 {
